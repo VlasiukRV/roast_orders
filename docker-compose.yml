@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
   app:
@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/app:rw  # Монтируем текущую директорию в контейнер
+      - .:/app:rw
     ports:
       - "5000:5000"
     environment:
