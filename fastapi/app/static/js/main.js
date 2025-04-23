@@ -71,12 +71,12 @@
                 itemDiv.innerHTML = `
                     <div>
                         <p class="font-medium">${item.name}</p>
-                        <p class="text-sm text-gray-600">${item.quantity} lb x $${item.price.toFixed(2)}</p>
+                        <p class="text-sm text-gray-350">${item.quantity} lb x $${item.price.toFixed(2)}</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="changeQuantity(${index}, -1)" class="px-2 py-1 bg-gray-200 rounded">−</button>
-                        <span>${item.quantity}</span>
-                        <button onclick="changeQuantity(${index}, 1)" class="px-2 py-1 bg-gray-200 rounded">+</button>
+                        <button onclick="changeQuantity(${index}, -1)" class="btn inline-block bg-orange-700 hover:bg-orange-800 text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">−</button>
+                        <span class="text-base sm:text-lg">${item.quantity}</span>
+                        <button onclick="changeQuantity(${index}, 1)" class="btn inline-block bg-orange-700 hover:bg-orange-800 text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">+</button>
                         <button onclick="removeItem(${index})" class="ml-3 text-red-500">🗑</button>
                     </div>
                 `;

@@ -1,0 +1,316 @@
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+
+<style>
+
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+    }
+
+    .btn {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    section {
+        background-color: rgba(0, 0, 0, 0.65);
+        border-radius: 1rem;
+        padding: 2rem;
+    }
+
+</style>
+
+<section class="max-w-4xl mx-auto mt-10 shadow-lg">
+
+    <div id="notification" class="fixed top-4 right-4 p-4 bg-light-brown-600 text-white rounded-lg shadow-lg hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <header class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-[#fff4dc]">Coffee Order</h2>
+        <a onclick="goToStep(2)" class="text-[#fbe8c2] flex items-center gap-2"  role="button">
+            <span>🛒</span>
+            <span id="item-count">0 items</span>
+        </a>
+    </header>
+
+    <form id="order-form" action="/api/order" method="post" onsubmit="prepareOrderData()" class="space-y-8">
+
+        <!-- Step 1: Products Groups-->
+
+        <div id="step-1">
+
+            <div class="space-y-6">
+
+                {% for group, products in grouped_products.items() %}
+
+                <div class="mb-4 rounded-md overflow-hidden shadow-sm">
+                    <!-- Заголовок группы -->
+                    <button class="w-full flex justify-between items-center px-4 py-3 text-left bg-gray-100 hover:bg-gray-200 font-semibold text-lg focus:outline-none group-toggle"
+                            onclick="toggleGroup(this)">
+                        <span class="text-2xl text-gray-900">
+                            {{ group }}
+                        </span>
+                        <svg class="w-5 h-5 transform transition-transform duration-300" fill="none"
+                             stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Контейнер товаров (аккордеон) -->
+                    <div class="group-content hidden px-4 py-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                            {% for product in products %}
+                            <!-- Sample Product Card -->
+                            <div class="bg-light-brown-600 text-gray-900 rounded-lg p-4 shadow">
+                                {% if product.image_url %}
+                                <img src="{{ product.image_url }}"
+                                     alt="{{ product.name }}"
+                                     class="rounded-md w-full h-48 object-cover mb-4">
+                                {% else %}
+                                <div class="rounded-md w-full h-48 object-cover mb-4 text-gray-500 text-sm">
+                                    No image
+                                </div>
+                                {% endif %}
+
+                                <h2 class="text-xl font-semibold text-[#fff4dc]">{{ product.name }}</h2>
+
+                                <div class="flex justify-between items-center">
+                                    <span class="text-green-700 font-bold text-lg">${{ product.price }}</span>
+                                    <button class="add-to-cart bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded"
+                                            data-name="{{ product.name }}"
+                                            data-price="{{ product.price }}">
+                                        Add to Cart
+                                    </button>
+                                </div>
+
+                                <p class="text-gray-600">{{ product.description }}</p>
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+
+            <div class="flex justify-between mt-6">
+
+                <button type="button" onclick="goToStep(3)"
+                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                    Back
+                </button>
+
+                <button type="button" onclick="goToStep(2)"
+                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                    Next
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Step 2: Cart -->
+
+        <div id="step-2" class="hidden">
+            <h2 class="text-2xl font-bold text-[#fff4dc] mb-4">Your Cart</h2>
+            <div id="cart-container" class="space-y-4">
+                <ul id="cart-items" class="text-[#fff4dc]"></ul>
+            </div>
+
+            <div class="text-right mt-4">
+                <p class="text-xl font-semibold">Total: <span id="cart-total">0</span> $</p>
+            </div>
+
+            <div class="flex justify-between mt-4">
+
+                <button type="button" onclick="goToStep(1)"
+                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                    Back
+                </button>
+
+                <button type="button" onclick="goToStep(3)"
+                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                    Next
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Step 3: User Info -->
+        <div id="step-3" class="hidden">
+            <h2 class="text-2xl font-bold text-[#fff4dc] mb-4">Your Info</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-[#fff4dc]">Name</label>
+                    <input type="text" id="name" name="name" required class="w-full p-2 rounded border text-gray-900">
+                </div>
+                <div>
+                    <label for="phone" class="block text-[#fff4dc]">Phone</label>
+                    <input type="tel" id="phone" name="phone" required class="w-full p-2 rounded border text-gray-900">
+                </div>
+                <div>
+                    <label for="email" class="block text-[#fff4dc]">Email (optional)</label>
+                    <input type="email" id="email" name="email" class="w-full p-2 rounded border text-gray-900">
+                </div>
+                <div>
+                    <label for="address" class="block text-[#fff4dc]">Delivery Address</label>
+                    <textarea id="address" name="address" required
+                              class="w-full p-2 rounded border text-gray-900"></textarea>
+                </div>
+            </div>
+
+            <input type="hidden" name="cart_data" id="cart-data"/>
+
+            <div class="flex justify-between mt-4">
+                <button type="button" onclick="goToStep(2)"
+                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                    Back
+                </button>
+                <button type="submit"
+                        class="btn bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg shadow">
+                    Place Order
+                </button>
+            </div>
+        </div>
+    </form>
+
+</section>
+
+<script>
+    function goToStep(step) {
+        document.getElementById('step-1').classList.toggle('hidden', step !== 1);
+        document.getElementById('step-2').classList.toggle('hidden', step !== 2);
+        document.getElementById('step-3').classList.toggle('hidden', step !== 3);
+    }
+
+    function prepareOrderData() {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        document.getElementById("cart-data").value = JSON.stringify(cart);
+    }
+
+    function toggleGroup(button) {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('svg');
+
+        content.classList.toggle('hidden');
+        icon.classList.toggle('rotate-180');
+    }
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+
+
+
+
+            const cartContainer = document.getElementById("cart-container");
+            const cartTotal = document.getElementById("cart-total");
+
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let total = 0;
+
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                const messageElement = document.getElementById('notification-message');
+
+                messageElement.textContent = message; // Устанавливаем сообщение в уведомление
+                notification.classList.remove('hidden'); // Показываем уведомление
+
+                // Через 3 секунды скрываем уведомление
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 3000);
+            }
+
+            function saveCart() {
+                localStorage.setItem("cart", JSON.stringify(cart));
+            }
+
+            function addToCart(name, price) {
+                const existing = cart.find(item => item.name === name);
+                if (existing) {
+                    existing.quantity += 1;
+                } else {
+                    cart.push({name, price: parseFloat(price), quantity: 1});
+                }
+
+                saveCart();
+                renderCart();
+                showNotification(`${name} has been added to your cart!`);
+
+            }
+
+            document.querySelectorAll(".add-to-cart").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const name = btn.dataset.name;
+                    const price = btn.dataset.price;
+                    addToCart(name, price);
+                });
+            });
+
+            function renderCart() {
+                cartContainer.innerHTML = "";
+                total = 0; // Update the total amount when rendering the cart
+
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.getElementById("item-count").textContent = `${totalItems} items`;
+
+                if (cart.length === 0) {
+                    cartContainer.innerHTML = "<p>Your cart is empty. <a href='/shop'>Go to shop</a></p>";
+                    cartTotal.textContent = "0";
+                    saveCart();
+                    return;
+                }
+
+                cart.forEach((item, index) => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+
+                    const itemDiv = document.createElement("div");
+                    itemDiv.className = "flex justify-between items-center border-b pb-2";
+
+                    itemDiv.innerHTML = `
+                    <div>
+                        <p class="font-medium">${item.name}</p>
+                        <p class="text-sm text-gray-350">${item.quantity} lb x $${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeQuantity(${index}, -1)" class="btn inline-block bg-orange-700 hover:bg-orange-800 text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">−</button>
+                        <span class="text-base sm:text-lg">${item.quantity}</span>
+                        <button onclick="changeQuantity(${index}, 1)" class="btn inline-block bg-orange-700 hover:bg-orange-800 text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">+</button>
+                        <a onclick="removeItem(${index})" class="ml-3 text-red-500" role="button">🗑</a>
+                    </div>
+                `;
+
+                    cartContainer.appendChild(itemDiv);
+                });
+
+                cartTotal.textContent = total.toFixed(2);
+                saveCart();
+            }
+
+            window.changeQuantity = (index, delta) => {
+                if ((cart[index].quantity + delta) >= 1) {
+                    cart[index].quantity += delta;
+                    renderCart();
+
+                    showNotification(`For ${cart[index].name} changed quantity!`);
+                }
+            };
+
+            window.removeItem = (index) => {
+                cart.splice(index, 1);
+                renderCart();
+
+                showNotification(`${cart[index].name} deleted!`);
+            };
+
+            renderCart();
+
+
+
+</script>

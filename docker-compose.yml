@@ -1,15 +1,58 @@
 version: '3.3'
 
 services:
-  app:
+  fastapi:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./fastapi
+    container_name: fastapi_app
+    networks:
+      - backend
     volumes:
-      - .:/app:rw
-    ports:
-      - "5000:5000"
+      - ./fastapi:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress_app
     environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    networks:
+      - backend
+    volumes:
+      - ./wordpress:/var/www/html
+
+  db:
+    image: mysql:5.7
+    container_name: wordpress_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: frontend_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - backend
+    depends_on:
+      - fastapi
+      - wordpress
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db_data:

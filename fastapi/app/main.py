@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from app.api.http_router import app_router
-from app.config import UVICORN_HOST, UVICORN_PORT, WORK_DIR
+from app.config import UVICORN_HOST, UVICORN_PORT
 
 app = FastAPI(title="RoastOrder", version="1.0.1")
 

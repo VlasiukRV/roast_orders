@@ -1,5 +1,4 @@
-from typing import Dict
-import json
+from typing import Dict, List
 
 from fastapi import Request, APIRouter, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -14,7 +13,7 @@ from app.services.order_service import create_order, save_order
 
 app_router = APIRouter()
 
-@app_router.get("/", response_class=HTMLResponse)
+@app_router.get("/api/", response_class=HTMLResponse)
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
@@ -31,11 +30,52 @@ async def render_index_page(
         logger.error("index.html not found")
         return HTMLResponse(content="index.html not found", status_code=404)
 
+@app_router.get("/api/lending", response_class=HTMLResponse)
+async def render_index_page(
+        request: Request,
+        templates: Jinja2Templates = Depends(get_jinja_template),
+        grouped_products: Dict[str, str] = Depends(get_group_products)
+) -> HTMLResponse:
+    try:
+        versions = get_static_file_versions_for_index_page()
+        return templates.TemplateResponse("lending.html", {
+            "request": request,
+            "grouped_products": grouped_products,
+            **versions
+        })
+    except FileNotFoundError:
+        logger.error("index.html not found")
+        return HTMLResponse(content="index.html not found", status_code=404)
 
-@app_router.route("/order", methods=["POST"])
+
+@app_router.get("/api/get-order-form", response_class=HTMLResponse)
+async def render_index_page(
+        request: Request,
+        templates: Jinja2Templates = Depends(get_jinja_template),
+        grouped_products: Dict[str, str] = Depends(get_group_products)
+) -> HTMLResponse:
+    try:
+        versions = get_static_file_versions_for_index_page()
+        return templates.TemplateResponse("order_form.html", {
+            "request": request,
+            "grouped_products": grouped_products,
+            **versions
+        })
+    except FileNotFoundError:
+        logger.error("order_form.html not found")
+        return HTMLResponse(content="index.html not found", status_code=404)
+
+@app_router.get("/api/grouped-products", response_class=JSONResponse)
+async def get_grouped_products(
+        request: Request,
+        grouped_products: Dict[str, str] = Depends(get_group_products)
+) -> JSONResponse:
+    return JSONResponse(content=grouped_products)
+
+@app_router.route("/api/order", methods=["POST"])
 async def order(
         request: Request,
-):
+) -> JSONResponse:
     form = await request.form()
 
     order = create_order(
@@ -54,7 +94,7 @@ async def order(
             "order_id": order.order_id
         })
 
-@app_router.get("/orders")
+@app_router.get("/api/orders")
 def orders(
         request: Request,
         page: int = 1,
@@ -77,7 +117,7 @@ def orders(
             "total_pages": total_pages}
     )
 
-@app_router.post("/update_order_status")
+@app_router.post("/api/update_order_status")
 async def update_order_status(
         request: Request,
         all_rows = Depends(get_orders)

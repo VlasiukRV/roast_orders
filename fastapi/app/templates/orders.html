@@ -28,7 +28,7 @@
                 </span>
             </span>
 
-            <form action="/update_order_status" method="POST" class="flex space-x-2">
+            <form action="/api/update_order_status" method="POST" class="flex space-x-2">
                 <input type="hidden" name="order_id" value="{{ order['order_id'] }}">
                 <select name="status" class="border rounded px-2 py-1 text-sm">
                     <option value="In Process" {% if order["Status"] == "In Process" %}selected{% endif %}>In Process</option>
@@ -46,19 +46,19 @@
 
 <div class="flex justify-center mt-8 space-x-2">
     {% if page > 1 %}
-    <a href="/orders?page={{ page - 1 }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+    <a href="/api/orders?page={{ page - 1 }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
         ← Prev
     </a>
     {% endif %}
 
     {% for p in range(1, total_pages + 1) %}
-    <a href="/orders?page={{ p }}" class="px-3 py-1 rounded {{ 'bg-blue-500 text-white' if p == page else 'bg-gray-100 text-gray-700' }}">
+    <a href="/api/orders?page={{ p }}" class="px-3 py-1 rounded {{ 'bg-blue-500 text-white' if p == page else 'bg-gray-100 text-gray-700' }}">
         {{ p }}
     </a>
     {% endfor %}
 
     {% if page < total_pages %}
-    <a href="/orders?page={{ page + 1 }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+    <a href="/api/orders?page={{ page + 1 }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
         Next →
     </a>
     {% endif %}

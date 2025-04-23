@@ -1,5 +1,5 @@
 import os
-from typing import Dict
+from typing import Dict, List
 from collections import defaultdict
 
 from starlette.templating import Jinja2Templates
@@ -22,14 +22,14 @@ def get_static_file_versions_for_admin_page() -> Dict[str, str]:
     css_file_version = generate_version(os.path.join('/app/static/css/', 'styles.css'))
     return {"js_file_version": js_file_version, "css_file_version": css_file_version}
 
-def get_group_products():
+def get_group_products() -> Dict[str, List[Dict]]:
     products = load_products()
 
     grouped = defaultdict(list)
     for product in products:
         group = product.get('group', 'Uncategorized')
         grouped[group].append(product)
-    return grouped
+    return dict(grouped)
 
 def get_products()-> Dict[str, str]:
     return load_products()
