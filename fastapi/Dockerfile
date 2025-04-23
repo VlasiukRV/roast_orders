@@ -8,7 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копировать код в контейнер (на случай, если не используешь volume)
-COPY .. .
+COPY . .
 
 # Открываем порт
 EXPOSE 8000
