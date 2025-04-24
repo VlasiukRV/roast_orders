@@ -44,7 +44,7 @@
 
                 <div class="mb-4 rounded-md overflow-hidden shadow-sm">
                     <!-- Заголовок группы -->
-                    <button class="w-full flex justify-between items-center px-4 py-3 text-left bg-gray-100 hover:bg-gray-200 font-semibold text-lg focus:outline-none group-toggle"
+                    <button class="w-full flex justify-between items-center px-4 py-3 text-left font-semibold text-lg focus:outline-none group-toggle"
                             onclick="toggleGroup(this)">
                         <span class="text-2xl text-gray-900">
                             {{ group }}
@@ -76,7 +76,7 @@
 
                                 <div class="flex justify-between items-center">
                                     <span class="text-green-700 font-bold text-lg">${{ product.price }}</span>
-                                    <button class="add-to-cart bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded"
+                                    <button class="add-to-cart text-white px-4 py-1 rounded"
                                             data-name="{{ product.name }}"
                                             data-price="{{ product.price }}">
                                         Add to Cart
@@ -98,12 +98,12 @@
             <div class="flex justify-between mt-6">
 
                 <button type="button" onclick="goToStep(3)"
-                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn text-white px-6 py-3 rounded-lg shadow">
                     Back
                 </button>
 
                 <button type="button" onclick="goToStep(2)"
-                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn text-white px-6 py-3 rounded-lg shadow">
                     Next
                 </button>
             </div>
@@ -125,12 +125,12 @@
             <div class="flex justify-between mt-4">
 
                 <button type="button" onclick="goToStep(1)"
-                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn text-white px-6 py-3 rounded-lg shadow">
                     Back
                 </button>
 
                 <button type="button" onclick="goToStep(3)"
-                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn text-white px-6 py-3 rounded-lg shadow">
                     Next
                 </button>
             </div>
@@ -165,7 +165,7 @@
 
             <div class="flex justify-between mt-4">
                 <button type="button" onclick="goToStep(2)"
-                        class="btn bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn text-white px-6 py-3 rounded-lg shadow">
                     Back
                 </button>
                 <button type="submit"
@@ -279,9 +279,9 @@
                         <p class="text-sm text-gray-350">${item.quantity} lb x $${item.price.toFixed(2)}</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="changeQuantity(${index}, -1)" class="btn inline-block bg-orange-700 hover:bg-orange-800 text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">−</button>
+                        <button onclick="changeQuantity(${index}, -1)" class="btn inline-block text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">−</button>
                         <span class="text-base sm:text-lg">${item.quantity}</span>
-                        <button onclick="changeQuantity(${index}, 1)" class="btn inline-block bg-orange-700 hover:bg-orange-800 text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">+</button>
+                        <button onclick="changeQuantity(${index}, 1)" class="btn inline-block text-white text-base sm:text-lg px-6 py-3 rounded-lg shadow transition duration-200">+</button>
                         <a onclick="removeItem(${index})" class="ml-3 text-red-500" role="button">🗑</a>
                     </div>
                 `;
