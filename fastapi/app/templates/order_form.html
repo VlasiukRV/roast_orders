@@ -26,7 +26,7 @@
 
     <header class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-bold text-[#fff4dc]">Coffee Order</h2>
-        <a onclick="goToStep(2)" class="text-[#fbe8c2] flex items-center gap-2"  role="button">
+        <a onclick="goToStep(2)" class="text-[#fbe8c2] flex items-center gap-2" role="button">
             <span>🛒</span>
             <span id="item-count">0 items</span>
         </a>
@@ -46,7 +46,7 @@
                     <!-- Заголовок группы -->
                     <button class="w-full flex justify-between items-center px-4 py-3 text-left font-semibold text-lg focus:outline-none group-toggle"
                             onclick="toggleGroup(this)">
-                        <span class="text-2xl text-gray-900">
+                        <span class="text-2xl text-[#fbe8c2]">
                             {{ group }}
                         </span>
                         <svg class="w-5 h-5 transform transition-transform duration-300" fill="none"
@@ -172,6 +172,12 @@
                         class="btn bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg shadow">
                     Place Order
                 </button>
+
+                <button id="checkout-button" type="button"
+                        class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow">
+                    Pay with Card
+                </button>
+
             </div>
         </div>
     </form>
@@ -203,77 +209,73 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
+    const cartContainer = document.getElementById("cart-container");
+    const cartTotal = document.getElementById("cart-total");
 
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let total = 0;
 
+    function showNotification(message) {
+        const notification = document.getElementById('notification');
+        const messageElement = document.getElementById('notification-message');
 
+        messageElement.textContent = message; // Устанавливаем сообщение в уведомление
+        notification.classList.remove('hidden'); // Показываем уведомление
 
-            const cartContainer = document.getElementById("cart-container");
-            const cartTotal = document.getElementById("cart-total");
+        // Через 3 секунды скрываем уведомление
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 3000);
+    }
 
-            const cart = JSON.parse(localStorage.getItem("cart")) || [];
-            let total = 0;
+    function saveCart() {
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }
 
-            function showNotification(message) {
-                const notification = document.getElementById('notification');
-                const messageElement = document.getElementById('notification-message');
+    function addToCart(name, price) {
+        const existing = cart.find(item => item.name === name);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            cart.push({name, price: parseFloat(price), quantity: 1});
+        }
 
-                messageElement.textContent = message; // Устанавливаем сообщение в уведомление
-                notification.classList.remove('hidden'); // Показываем уведомление
+        saveCart();
+        renderCart();
+        showNotification(`${name} has been added to your cart!`);
 
-                // Через 3 секунды скрываем уведомление
-                setTimeout(() => {
-                    notification.classList.add('hidden');
-                }, 3000);
-            }
+    }
 
-            function saveCart() {
-                localStorage.setItem("cart", JSON.stringify(cart));
-            }
+    document.querySelectorAll(".add-to-cart").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const name = btn.dataset.name;
+            const price = btn.dataset.price;
+            addToCart(name, price);
+        });
+    });
 
-            function addToCart(name, price) {
-                const existing = cart.find(item => item.name === name);
-                if (existing) {
-                    existing.quantity += 1;
-                } else {
-                    cart.push({name, price: parseFloat(price), quantity: 1});
-                }
+    function renderCart() {
+        cartContainer.innerHTML = "";
+        total = 0; // Update the total amount when rendering the cart
 
-                saveCart();
-                renderCart();
-                showNotification(`${name} has been added to your cart!`);
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById("item-count").textContent = `${totalItems} items`;
 
-            }
+        if (cart.length === 0) {
+            cartContainer.innerHTML = "<p>Your cart is empty. <a href='/shop'>Go to shop</a></p>";
+            cartTotal.textContent = "0";
+            saveCart();
+            return;
+        }
 
-            document.querySelectorAll(".add-to-cart").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const name = btn.dataset.name;
-                    const price = btn.dataset.price;
-                    addToCart(name, price);
-                });
-            });
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
 
-            function renderCart() {
-                cartContainer.innerHTML = "";
-                total = 0; // Update the total amount when rendering the cart
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "flex justify-between items-center border-b pb-2";
 
-                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                document.getElementById("item-count").textContent = `${totalItems} items`;
-
-                if (cart.length === 0) {
-                    cartContainer.innerHTML = "<p>Your cart is empty. <a href='/shop'>Go to shop</a></p>";
-                    cartTotal.textContent = "0";
-                    saveCart();
-                    return;
-                }
-
-                cart.forEach((item, index) => {
-                    const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-
-                    const itemDiv = document.createElement("div");
-                    itemDiv.className = "flex justify-between items-center border-b pb-2";
-
-                    itemDiv.innerHTML = `
+            itemDiv.innerHTML = `
                     <div>
                         <p class="font-medium">${item.name}</p>
                         <p class="text-sm text-gray-350">${item.quantity} lb x $${item.price.toFixed(2)}</p>
@@ -286,31 +288,31 @@
                     </div>
                 `;
 
-                    cartContainer.appendChild(itemDiv);
-                });
+            cartContainer.appendChild(itemDiv);
+        });
 
-                cartTotal.textContent = total.toFixed(2);
-                saveCart();
-            }
+        cartTotal.textContent = total.toFixed(2);
+        saveCart();
+    }
 
-            window.changeQuantity = (index, delta) => {
-                if ((cart[index].quantity + delta) >= 1) {
-                    cart[index].quantity += delta;
-                    renderCart();
-
-                    showNotification(`For ${cart[index].name} changed quantity!`);
-                }
-            };
-
-            window.removeItem = (index) => {
-                cart.splice(index, 1);
-                renderCart();
-
-                showNotification(`${cart[index].name} deleted!`);
-            };
-
+    window.changeQuantity = (index, delta) => {
+        if ((cart[index].quantity + delta) >= 1) {
+            cart[index].quantity += delta;
             renderCart();
 
+            showNotification(`For ${cart[index].name} changed quantity!`);
+        }
+    };
 
+    window.removeItem = (index) => {
+        cart.splice(index, 1);
+        renderCart();
+
+        showNotification(`${cart[index].name} deleted!`);
+    };
+
+    renderCart();
 
 </script>
+
+<script src="https://js.stripe.com/v3/"></script>
