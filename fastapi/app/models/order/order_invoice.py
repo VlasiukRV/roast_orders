@@ -75,7 +75,7 @@ def __generate_invoice_base64(order_data: Order):
    
     ''')
 
-    pdf_gen.add_table(order_data.order_items_to_table(order_data.order_items), sum_columns=[4])
+    pdf_gen.add_table(order_data.order_items_to_table(), sum_columns=[4])
     pdf_base64 = pdf_gen.get_base64()
 
     return pdf_base64
@@ -86,7 +86,7 @@ def get_invoice_data(order_data: Order):
     due_date = dt + timedelta(days=15)
 
     context = {
-        "logo_base64": encode_image_base64("app/templates/_logo.png"),
+        "logo_base64": encode_image_base64("app/templates/logo.png"),
         "format_data_1": dt.strftime("%b '%Y"),
         "format_data_2": dt.strftime("%d%m%y"),
         "format_data_3": dt.strftime("%d %b %Y"),
