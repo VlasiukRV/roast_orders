@@ -5,16 +5,16 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from starlette.responses import PlainTextResponse
 from starlette.templating import Jinja2Templates
 
-from app.api.dependencies import get_jinja_template, get_static_file_versions_for_index_page
+from app.api.http_app_dependencies import get_jinja_template, get_static_file_versions_for_index_page
 from app.common.utils import logger
 from app.models.order.order_service import create_order, save_order, get_orders, update_order_status_by_row
 from app.models.order.order_schema import OrderCreate
 from app.models.product.product_service import get_products_group_by_group
 from app.models.order.order_invoice import generate_invoice_base64, get_pdf_invoice_by_id
 
-app_router = APIRouter()
+router = APIRouter()
 
-@app_router.get("/api/", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
@@ -31,7 +31,7 @@ async def render_index_page(
         logger.error("index.html not found")
         return HTMLResponse(content="index.html not found", status_code=404)
 
-@app_router.get("/api/lending", response_class=HTMLResponse)
+@router.get("/lending", response_class=HTMLResponse)
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
@@ -49,7 +49,7 @@ async def render_index_page(
         return HTMLResponse(content="index.html not found", status_code=404)
 
 
-@app_router.get("/api/get-order-form", response_class=HTMLResponse)
+@router.get("/get-order-form", response_class=HTMLResponse)
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
@@ -66,14 +66,13 @@ async def render_index_page(
         logger.error("order_form.html not found")
         return HTMLResponse(content="index.html not found", status_code=404)
 
-@app_router.get("/api/grouped-products", response_class=JSONResponse)
+@router.get("/grouped-products", response_class=JSONResponse)
 async def get_grouped_products(
-        request: Request,
         grouped_products: Dict[str, str] = Depends(get_products_group_by_group)
 ) -> JSONResponse:
     return JSONResponse(content=grouped_products)
 
-@app_router.post("/api/order")
+@router.post("/order")
 async def order(
         data: OrderCreate = Depends(OrderCreate.as_form)
 ) -> JSONResponse:
@@ -93,7 +92,7 @@ async def order(
             "base64_invoice": base64_invoice,
         })
 
-@app_router.get("/api/invoice/{order_id}")
+@router.get("/order/invoice/{order_id}")
 def get_invoice(order_id):
 
     pdf = get_pdf_invoice_by_id(order_id)
@@ -109,7 +108,7 @@ def get_invoice(order_id):
         }
     )
 
-@app_router.get("/api/orders")
+@router.get("/order/orders")
 def orders(
         request: Request,
         page: int = 1,
@@ -132,7 +131,7 @@ def orders(
             "total_pages": total_pages}
     )
 
-@app_router.post("/api/update_order_status")
+@router.post("/order/update_order_status")
 async def update_order_status(
         request: Request,
         all_rows = Depends(get_orders)

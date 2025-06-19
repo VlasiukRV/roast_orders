@@ -1,6 +1,5 @@
 import os
 from typing import Dict
-
 from starlette.templating import Jinja2Templates
 
 from app.common.utils import generate_version

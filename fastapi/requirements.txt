@@ -13,3 +13,6 @@ pydantic~=2.9.2
 premailer
 reportlab
 pandas
+
+passlib[bcrypt]
+python-jose
