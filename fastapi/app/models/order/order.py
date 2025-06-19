@@ -149,8 +149,8 @@ class Order(BaseModel):
             base64_invoice=base64_invoice,
         )
 
-    def order_items_to_table(self, order_items: list[OrderItem]) -> list[list]:
+    def order_items_to_table(self) -> list[list]:
         data = []
-        for item in order_items:
+        for item in self.order_items:
             data.append(item.to_row())
         return data
