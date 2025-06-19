@@ -1,15 +1,16 @@
-from typing import Dict, List
+from typing import Dict
 
-from fastapi import Request, APIRouter, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import Request, APIRouter, Depends, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from starlette.responses import PlainTextResponse
 from starlette.templating import Jinja2Templates
 
-from app.api.dependencies import get_jinja_template, get_static_file_versions_for_index_page, get_orders, \
-    get_group_products
-from app.utils import logger
-from app.model.sheets import update_order_status_by_row
-from app.services.order_service import create_order, save_order
+from app.api.dependencies import get_jinja_template, get_static_file_versions_for_index_page
+from app.common.utils import logger
+from app.models.order.order_service import create_order, save_order, get_orders, update_order_status_by_row
+from app.models.order.order_schema import OrderCreate
+from app.models.product.product_service import get_products_group_by_group
+from app.models.order.order_invoice import generate_invoice_base64, get_pdf_invoice_by_id
 
 app_router = APIRouter()
 
@@ -17,7 +18,7 @@ app_router = APIRouter()
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
-        grouped_products: Dict[str, str] = Depends(get_group_products)
+        grouped_products: Dict[str, str] = Depends(get_products_group_by_group)
 ) -> HTMLResponse:
     try:
         versions = get_static_file_versions_for_index_page()
@@ -34,7 +35,7 @@ async def render_index_page(
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
-        grouped_products: Dict[str, str] = Depends(get_group_products)
+        grouped_products: Dict[str, str] = Depends(get_products_group_by_group)
 ) -> HTMLResponse:
     try:
         versions = get_static_file_versions_for_index_page()
@@ -52,7 +53,7 @@ async def render_index_page(
 async def render_index_page(
         request: Request,
         templates: Jinja2Templates = Depends(get_jinja_template),
-        grouped_products: Dict[str, str] = Depends(get_group_products)
+        grouped_products: Dict[str, str] = Depends(get_products_group_by_group)
 ) -> HTMLResponse:
     try:
         versions = get_static_file_versions_for_index_page()
@@ -68,31 +69,45 @@ async def render_index_page(
 @app_router.get("/api/grouped-products", response_class=JSONResponse)
 async def get_grouped_products(
         request: Request,
-        grouped_products: Dict[str, str] = Depends(get_group_products)
+        grouped_products: Dict[str, str] = Depends(get_products_group_by_group)
 ) -> JSONResponse:
     return JSONResponse(content=grouped_products)
 
-@app_router.route("/api/order", methods=["POST"])
+@app_router.post("/api/order")
 async def order(
-        request: Request,
+        data: OrderCreate = Depends(OrderCreate.as_form)
 ) -> JSONResponse:
-    form = await request.form()
 
-    order = create_order(
-        name=form.get("name"),
-        phone=form.get("phone"),
-        email=form.get("email", ""),
-        address=form.get("address", ""),
-        cart_raw=form.get("cart_data")
-    )
+    order_data = create_order(data)
 
-    save_order(order)
+    base64_invoice = generate_invoice_base64(order_data)
+    order_data.base64_invoice = base64_invoice
+
+    save_order(order_data)
 
     return JSONResponse(
         {
             "message": "Order received",
-            "order_id": order.order_id
+            "order_id": order_data.order_id,
+            "base64_invoice_url": f"/api/invoice/{order_data.order_id}",
+            "base64_invoice": base64_invoice,
         })
+
+@app_router.get("/api/invoice/{order_id}")
+def get_invoice(order_id):
+
+    pdf = get_pdf_invoice_by_id(order_id)
+
+    if not pdf:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename=invoice_{order_id}.pdf"
+        }
+    )
 
 @app_router.get("/api/orders")
 def orders(

@@ -1,6 +1,7 @@
 # Docker / Dev
-nginx/
-wordpress/
+/nginx/
+/wordpress/
+/mysql-data/
 
 # Python bytecode
 __pycache__/

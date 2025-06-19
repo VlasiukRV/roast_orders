@@ -20,13 +20,13 @@
 
 <section class="max-w-4xl mx-auto mt-10 shadow-lg">
 
-    <div id="notification" class="fixed top-4 right-4 p-4 bg-light-brown-600 text-white rounded-lg shadow-lg hidden">
+    <div id="notification" class="fixed top-4 right-4 p-4 bg-light-brown-600 rounded-lg shadow-lg hidden">
         <span id="notification-message"></span>
     </div>
 
     <header class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-[#fff4dc]">Coffee Order</h2>
-        <a onclick="goToStep(2)" class="text-[#fbe8c2] flex items-center gap-2" role="button">
+        <h2 class="text-3xl font-bold">Coffee Order</h2>
+        <a onclick="goToStep(2)" class=" flex items-center gap-2" role="button">
             <span>🛒</span>
             <span id="item-count">0 items</span>
         </a>
@@ -46,7 +46,7 @@
                     <!-- Заголовок группы -->
                     <button class="w-full flex justify-between items-center px-4 py-3 text-left font-semibold text-lg focus:outline-none group-toggle"
                             onclick="toggleGroup(this)">
-                        <span class="text-2xl text-[#fbe8c2]">
+                        <span class="text-2xl">
                             {{ group }}
                         </span>
                         <svg class="w-5 h-5 transform transition-transform duration-300" fill="none"
@@ -61,29 +61,29 @@
 
                             {% for product in products %}
                             <!-- Sample Product Card -->
-                            <div class="bg-light-brown-600 text-gray-900 rounded-lg p-4 shadow">
+                            <div class="bg-light-brown-600 rounded-lg p-4 shadow">
                                 {% if product.image_url %}
                                 <img src="{{ product.image_url }}"
                                      alt="{{ product.name }}"
-                                     class="rounded-md w-full h-48 object-cover mb-4">
+                                     class="rounded-md w-full size-40 object-cover mb-4">
                                 {% else %}
-                                <div class="rounded-md w-full h-48 object-cover mb-4 text-gray-500 text-sm">
+                                <div class="rounded-md w-full size-40 object-cover mb-4 text-sm">
                                     No image
                                 </div>
                                 {% endif %}
 
-                                <h2 class="text-xl" style="color: var(--e-global-color-text);">{{ product.name }}</h2>
+                                <h2 class="text-l" >{{ product.name }}</h2>
 
-                                <div class="flex justify-between items-center">
+                                <div class="flex justify-between items-center p-2">
                                     <span class="text-green-700 font-bold text-lg">${{ product.price }}</span>
-                                    <button class="add-to-cart text-white px-4 py-1 rounded"
+                                    <button class="add-to-cart px-4 py-1 rounded"
                                             data-name="{{ product.name }}"
                                             data-price="{{ product.price }}">
                                         Add to Cart
                                     </button>
                                 </div>
 
-                                <p class="text-gray-600">{{ product.description }}</p>
+                                <p class="">{{ product.description }}</p>
                             </div>
 
                             {% endfor %}
@@ -165,16 +165,16 @@
 
             <div class="flex justify-between mt-4">
                 <button type="button" onclick="goToStep(2)"
-                        class="btn text-white px-6 py-3 rounded-lg shadow">
+                        class="btn px-6 py-3 rounded-lg shadow">
                     Back
                 </button>
                 <button type="submit"
-                        class="btn bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn bg-green-700 px-6 py-3 rounded-lg shadow">
                     Place Order
                 </button>
 
                 <button id="checkout-button" type="button"
-                        class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow">
+                        class="btn bg-indigo-600 px-6 py-3 rounded-lg shadow">
                     Pay with Card
                 </button>
 
