@@ -1,0 +1,7 @@
+{
+  "admin": {
+    "username": "admin",
+    "hashed_password": "$2b$12$dVeqse5Fu3c.4qSrc52O0umLBpwQQ/GRgcv0pbk3nkQYbvF/.4rlq",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc1MTE3NzA4Nn0.o360i1vayXyyM4nPvSruBP8MfwxNOnWA0aMP4Ing9KI"
+  }
+}

@@ -25,3 +25,7 @@ class OrderCreate(BaseModel):
             address=address,
             cart_data=cart_data
         )
+
+class OrderStatusUpdate(BaseModel):
+    order_id: str
+    status: str
