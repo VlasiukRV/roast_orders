@@ -21,7 +21,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     fake_users_db[user["username"]]["refresh_token"] = refresh_token_value
     save_users(fake_users_db)
 
-    return {"access_token": access_token, "refresh_token": refresh_token_value, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token_value,
+        "token_type": "bearer",
+        "username": user["username"]
+    }
 
 @router.post("/refresh")
 def refresh_token(refresh_token_input: str):
