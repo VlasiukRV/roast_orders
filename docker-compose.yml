@@ -9,7 +9,7 @@ services:
       - backend
     volumes:
       - ./fastapi:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   wordpress:
     image: wordpress:latest
@@ -21,6 +21,7 @@ services:
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
+    command: sh -c "echo 'StartServers 1\nMinSpareServers 1\nMaxSpareServers 2\nMaxRequestWorkers 4\nMaxConnectionsPerChild 1000' >> /etc/apache2/apache2.conf && docker-php-entrypoint apache2-foreground"
     networks:
       - backend
     depends_on:
@@ -31,6 +32,7 @@ services:
   db:
     image: mysql:5.7
     container_name: wordpress_db
+    command: --innodb-buffer-pool-size=64M --performance-schema=OFF
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: wordpress
@@ -57,6 +59,3 @@ services:
 networks:
   backend:
     driver: bridge
-
-volumes:
-  db_data:
