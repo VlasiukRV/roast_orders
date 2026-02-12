@@ -16,3 +16,6 @@ pandas
 
 passlib[bcrypt]
 python-jose
+python-jose[cryptography]
+python-jose[cryptography]
+weasyprint
