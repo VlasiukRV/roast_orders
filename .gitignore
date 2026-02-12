@@ -3,6 +3,8 @@
 /wordpress/
 /mysql-data/
 
+nginx/default.conf
+
 # Python bytecode
 __pycache__/
 *.pyc
