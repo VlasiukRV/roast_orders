@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
     shared-mime-info \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Установка зависимостей
 WORKDIR /app
@@ -23,7 +23,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копировать код в контейнер (на случай, если не используешь volume)
 COPY . .
 
+ENV PYTHONPATH=/app
 # Открываем порт
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
